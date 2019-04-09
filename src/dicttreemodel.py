@@ -33,10 +33,26 @@ def is_iterable(value) -> bool:
 class TreeNode:
     """
     TreeNode adapts Python data types to QTreeModel.
+    
+    QTreeView expects child nodes in the the tree to 'know' about their parents.
+    Basic Python data types (dicts, lists, strings, etc) don't have references
+    to their parents. TreeNode wraps plain data types to keep a reference to
+    the parent.
+    
+    QTreeView also expects child nodes to be indexed per parent, or tree level.
+    While this could be done with `list.index(item)` for lists, it's more
+    complex for mapping types, and it's also inefficient.
+    So TreeNode also stores the index per parent.
+    
+    The consequence is TreeNode isn't a dynamic adapter, ie. changes in the
+    underlying data are not automatically reflected in the TreeNodes, the
+    TreeModel and finally not immediately visible in the TreeView. To view
+    changes, the tree must be rebuilt. 
 
     Provide adapter callables to convert Python types to TreeNode. Comes with
     adapters for Iterable and Mapping. See ref:`TreeNode.adapter` for more.
     """
+    
     class Unacceptable(Exception):
         """
         TreeNode adapters must raise this exception for types they don't handle.
